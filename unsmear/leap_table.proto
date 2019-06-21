@@ -1,0 +1,59 @@
+// Copyright 2018 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package unsmear;
+
+// Times in this protocol buffer are represented as Julian Day Numbers.  This is
+// a continuous count of whole days since the day starting at noon, November 24,
+// 4714 BCE in the proleptic Gregorian Calendar.
+//
+// Julian days are from noon to noon, so a leap smear extends exactly across an
+// entire Julian day.  A day always contains 86,400 seconds in the smeared
+// timescale, and may contain 86,399, 86,400, or 86,401 seconds of Terrestrial
+// Time.  The leap second occurs exactly at the center of the Julian day.
+//
+// At the beginning and end of each Julian day, the smeared and unsmeared UTC
+// timescales are identical.
+//
+// The International Earth Rotation and Reference Systems Service (IERS)
+// announces leap seconds at least eight weeks in advance.  For more details on
+// leap seconds, see Recommendation ITU-R TF.460-6:
+// https://www.itu.int/rec/R-REC-TF.460/en
+
+message LeapTableProto {
+  // The Julian Day Numbers on which positive leap seconds were inserted into
+  // UTC, or negative leap seconds were deleted.  The 24-hour noon-to-noon
+  // interval of this day must span the end of a month.
+  repeated int32 positive_leaps = 1;
+  repeated int32 negative_leaps = 2;
+
+  // The latest point in time at which this leap table may be used to
+  // unambiguously convert between the smeared and unsmeared timescales.  The
+  // earliest convertible time is always the start of JDN 2441318, January 1,
+  // 1972 12:00:00 UTC and 12:00:10 TAI, which is the first Julian day in which
+  // UTC consisted entirely of seconds of Terrestrial Time.
+  //
+  // The leap table is valid to the end of the day indicated by end_jdn, i.e.,
+  // the start of the following day.  This must be the last full day of a
+  // calendar month.
+  //
+  // For example, in 2016, end_jdn would have been set to 2457753.  The table
+  // would expire at 2016-12-31 12:00:00 UTC, just before the then-unknown leap
+  // smear now indicated by "positive_leaps: 2457754".
+  //
+  // This field is required.
+  int32 end_jdn = 3;
+}
