@@ -1,0 +1,15 @@
+language: cpp
+
+os: linux
+dist: xenial
+
+addons:
+  apt:
+    sources:
+    - sourceline: 'deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8'
+      key_url: 'https://bazel.build/bazel-release.pub.gpg'
+    packages:
+    - bazel
+
+script:
+  - bazel test //...
