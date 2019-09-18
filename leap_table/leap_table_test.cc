@@ -351,7 +351,7 @@ void ExpectPrecise(const LeapTable& lt, absl::Time utc, TaiTime tai,
 
 TEST(CurrentLeapTableTest, CurrentLeapTable) {
   LeapTableProto pb;
-  std::ifstream input("leap_table.pb");
+  std::ifstream input("leap_table/leap_table.pb");
   ASSERT_TRUE(pb.ParseFromIstream(&input));
   auto lt = NewLeapTableFromProto(pb);
   ASSERT_TRUE(lt != nullptr);
