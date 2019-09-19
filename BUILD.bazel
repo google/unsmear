@@ -41,6 +41,16 @@ cc_test(
 )
 
 cc_test(
+    name = "leap_table_test",
+    srcs = ["unsmear/leap_table_test.cc"],
+    deps = [
+        ":unsmear",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_protobuf//:protobuf",
+    ],
+)
+
+cc_test(
     name = "time_test",
     srcs = ["unsmear/time_test.cc"],
     deps = [
