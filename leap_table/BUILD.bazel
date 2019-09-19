@@ -32,12 +32,11 @@ cc_binary(
 )
 
 cc_test(
-    name = "leap_table_test",
-    srcs = ["leap_table_test.cc"],
+    name = "current_leap_table_test",
+    srcs = ["current_leap_table_test.cc"],
     data = [":leap_table_data"],
     deps = [
         "//:unsmear",
         "@com_google_googletest//:gtest_main",
-        "@com_google_protobuf//:protobuf",
     ],
 )
