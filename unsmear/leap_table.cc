@@ -118,14 +118,12 @@ std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
       [](const internal::LeapTableEntry& a,
          const internal::LeapTableEntry& b) -> bool { return a.utc > b.utc; });
   if (entries.front().utc != expiration || entries.front().smear != 0) {
-    // Error: there are leap seconds after expiration.
     std::cerr
         << "Failed validating leap table: there are leap seconds after end_jdn"
         << std::endl;
     return nullptr;
   }
   if (entries.back().utc < ModernUtcEpoch()) {
-    // Error: the start is before the start of the smearing era.
     std::cerr << "Failed validating leap table: leap is before the epoch"
               << std::endl;
     return nullptr;
@@ -134,7 +132,6 @@ std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
   // Validate the table and fill in TAI for each entry.
   for (ssize_t i = entries.size() - 2; i >= 0; --i) {
     if (entries[i].utc == entries[i + 1].utc) {
-      // Error: duplicate or conflicting leap seconds.
       std::cerr << "Failed validating leap table: duplicate or conflicting "
                    "leap seconds"
                 << std::endl;
@@ -143,7 +140,6 @@ std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
     if (entries[i].smear != 0 &&
         absl::ToTM(entries[i].utc, absl::UTCTimeZone()).tm_mon ==
             absl::ToTM(entries[i + 1].utc, absl::UTCTimeZone()).tm_mon) {
-      // Error: leap second not at end of month.
       std::cerr
           << "Failed validating leap table: leap second is not at end of month"
           << std::endl;
