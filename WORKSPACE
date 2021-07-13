@@ -1,13 +1,14 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# bazel-skylib 0.8.0 released 2019.03.20 (https://github.com/bazelbuild/bazel-skylib/releases/tag/0.8.0)
-skylib_version = "0.8.0"
-
+# bazel-skylib 1.0.3 released 2020.08.27 (https://github.com/bazelbuild/bazel-skylib/releases/tag/1.0.3)
 http_archive(
     name = "bazel_skylib",
-    sha256 = "2ef429f5d7ce7111263289644d233707dba35e39696377ebab8b0bc701f7818e",
+    sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
     type = "tar.gz",
-    url = "https://github.com/bazelbuild/bazel-skylib/releases/download/{}/bazel-skylib.{}.tar.gz".format(skylib_version, skylib_version),
+    urls = [
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
+    ],
 )
 
 http_archive(
@@ -26,9 +27,9 @@ http_archive(
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "314323f52af1fcf73db2018184a660ce0ff9ad72bb674a6d5ac465e089670966",
-    strip_prefix = "protobuf-f2a919f58f12574ac04ca79e6b84577dec6f2b43",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/f2a919f58f12574ac04ca79e6b84577dec6f2b43.zip"],
+    sha256 = "528927e398f4e290001886894dac17c5c6a2e5548f3fb68004cfb01af901b53a",
+    strip_prefix = "protobuf-3.17.3",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.17.3.zip"],
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
