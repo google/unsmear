@@ -1,0 +1,24 @@
+# Format reference: https://docs.github.com/en/actions/reference
+name: Bazel test
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobs
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/marketplace/actions/checkout
+      - uses: actions/checkout@230611dbd0eb52da1e1f4f7bc8bb0c3a339fc8b7
+
+      - name: Build and Test
+        run: bazelisk test //...
