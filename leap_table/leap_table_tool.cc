@@ -21,6 +21,7 @@
 #include <unistd.h>
 
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -88,7 +89,7 @@ bool OutputProto(const unsmear::LeapTableProto& pb) {
 
 bool OutputTextProto(const unsmear::LeapTableProto& pb) {
   auto stream =
-      absl::make_unique<google::protobuf::io::FileOutputStream>(STDOUT_FILENO);
+      std::make_unique<google::protobuf::io::FileOutputStream>(STDOUT_FILENO);
   if (!google::protobuf::TextFormat::Print(pb, stream.get())) {
     return false;
   }
