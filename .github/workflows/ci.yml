@@ -3,7 +3,6 @@ name: Bazel test
 # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
 on:
   push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
