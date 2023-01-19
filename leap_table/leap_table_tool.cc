@@ -27,6 +27,8 @@
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/log/initialize.h"
+#include "absl/log/log.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
@@ -112,7 +114,7 @@ bool OutputJson(const unsmear::LeapTableProto& pb) {
 bool OutputDebug(const unsmear::LeapTableProto& pb) {
   auto lt = unsmear::NewLeapTableFromProto(pb);
   if (lt == nullptr) {
-    std::cerr << "Failed to construct leap table from proto\n";
+    LOG(ERROR) << "Failed to construct leap table from proto";
     return false;
   }
   std::cout << lt->DebugString();
@@ -123,8 +125,9 @@ bool OutputDebug(const unsmear::LeapTableProto& pb) {
 
 int main(int argc, char** argv) {
   std::vector<char*> args = absl::ParseCommandLine(argc, argv);
+  absl::InitializeLog();
   if (args.size() != 2) {
-    std::cerr << kUsage;
+    LOG(ERROR) << kUsage;
     return 2;
   }
   const auto& filename = args[1];
@@ -132,28 +135,27 @@ int main(int argc, char** argv) {
   unsmear::LeapTableProto pb;
   int fd = open(filename, O_RDONLY);
   if (fd < 0) {
-    std::cerr << "Couldn't open " << filename << ": " << strerror(errno)
-              << "\n";
+    PLOG(ERROR) << absl::StrCat("Couldn't open ", filename);
     return 1;
   }
   switch (absl::GetFlag(FLAGS_input)) {
     case Format::kProto:
       if (!pb.ParseFromFileDescriptor(fd)) {
-        std::cerr << "Couldn't parse proto from " << filename << "\n";
+        LOG(ERROR) << absl::StrCat("Couldn't parse proto from ", filename);
         return 1;
       }
       break;
     case Format::kTextProto: {
       google::protobuf::io::FileInputStream stream(fd);
       if (!google::protobuf::TextFormat::Parse(&stream, &pb)) {
-        std::cerr << "Couldn't parse text proto from " << filename << "\n";
+        LOG(ERROR) << absl::StrCat("Couldn't parse text proto from ", filename);
         return 1;
       }
       break;
     }
     case Format::kJson:
     case Format::kDebug:
-      std::cerr << "Unsupported --input\n";
+      LOG(ERROR) << "Unsupported --input";
       return 2;
   }
 

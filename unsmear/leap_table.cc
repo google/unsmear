@@ -15,6 +15,7 @@
 #include <iostream>
 #include <string>
 
+#include "absl/log/log.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/substitute.h"
@@ -57,8 +58,8 @@ absl::Time LeapTable::expiration() const { return entries_.front().utc; }
 std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
   int end_jdn = proto.end_jdn();
   if (end_jdn < kMinJdn || end_jdn > kMaxJdn) {
-    std::cerr << "Failed validating leap table: end_jdn was not in valid range"
-              << std::endl;
+    LOG(ERROR)
+        << "Failed validating leap table: end_jdn was not in valid range";
     return nullptr;
   }
 
@@ -67,9 +68,8 @@ std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
   absl::Time expiration = JdnToTime(proto.end_jdn() + 1);
   if (absl::ToTM(expiration + absl::Hours(24), absl::UTCTimeZone()).tm_mday !=
       1) {
-    std::cerr << "Failed validating leap table: end_jdn must be at the end of "
-                 "the month"
-              << std::endl;
+    LOG(ERROR) << "Failed validating leap table: end_jdn must be at the end of "
+                  "the month";
     return nullptr;
   }
 
@@ -88,8 +88,8 @@ std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
   size_t i = entries.size() - 2;
   for (const auto& jdn : proto.positive_leaps()) {
     if (jdn < kMinJdn || jdn > kMaxJdn) {
-      std::cerr << "Failed validating leap table: positive leap " << jdn
-                << " was not in valid range" << std::endl;
+      LOG(ERROR) << absl::StrCat("Failed validating leap table: positive leap ",
+                                 jdn, " was not in valid range");
       return nullptr;
     }
     entries[i].utc = JdnToTime(jdn);
@@ -101,8 +101,8 @@ std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
   }
   for (const auto& jdn : proto.negative_leaps()) {
     if (jdn < kMinJdn || jdn > kMaxJdn) {
-      std::cerr << "Failed validating leap table: negative leap " << jdn
-                << " was not in valid range" << std::endl;
+      LOG(ERROR) << absl::StrCat("Failed validating leap table: negative leap ",
+                                 jdn, " was not in valid range");
       return nullptr;
     }
     entries[i].utc = JdnToTime(jdn);
@@ -118,31 +118,27 @@ std::unique_ptr<LeapTable> NewLeapTableFromProto(const LeapTableProto& proto) {
       [](const internal::LeapTableEntry& a,
          const internal::LeapTableEntry& b) -> bool { return a.utc > b.utc; });
   if (entries.front().utc != expiration || entries.front().smear != 0) {
-    std::cerr
-        << "Failed validating leap table: there are leap seconds after end_jdn"
-        << std::endl;
+    LOG(ERROR)
+        << "Failed validating leap table: there are leap seconds after end_jdn";
     return nullptr;
   }
   if (entries.back().utc < ModernUtcEpoch()) {
-    std::cerr << "Failed validating leap table: leap is before the epoch"
-              << std::endl;
+    LOG(ERROR) << "Failed validating leap table: leap is before the epoch";
     return nullptr;
   }
 
   // Validate the table and fill in TAI for each entry.
   for (ssize_t i = entries.size() - 2; i >= 0; --i) {
     if (entries[i].utc == entries[i + 1].utc) {
-      std::cerr << "Failed validating leap table: duplicate or conflicting "
-                   "leap seconds"
-                << std::endl;
+      LOG(ERROR) << "Failed validating leap table: duplicate or conflicting "
+                    "leap seconds";
       return nullptr;
     }
     if (entries[i].smear != 0 &&
         absl::ToTM(entries[i].utc, absl::UTCTimeZone()).tm_mon ==
             absl::ToTM(entries[i + 1].utc, absl::UTCTimeZone()).tm_mon) {
-      std::cerr
-          << "Failed validating leap table: leap second is not at end of month"
-          << std::endl;
+      LOG(ERROR)
+          << "Failed validating leap table: leap second is not at end of month";
       return nullptr;
     }
     entries[i].tai =
