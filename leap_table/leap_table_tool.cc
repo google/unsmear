@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
   absl::InitializeLog();
 
   if (args.size() != 2) {
-    QLOG(FATAL) << kUsage;
+    LOG(QFATAL) << kUsage;
   }
   const auto& filename = args[1];
 
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
     }
     case Format::kJson:
     case Format::kDebug:
-      QLOG(FATAL) << "Unsupported --input";
+      LOG(QFATAL) << "Unsupported --input";
   }
 
   switch (absl::GetFlag(FLAGS_output)) {
