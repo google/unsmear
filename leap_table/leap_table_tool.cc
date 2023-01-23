@@ -27,6 +27,9 @@
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/log/check.h"
+#include "absl/log/initialize.h"
+#include "absl/log/log.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
@@ -93,10 +96,7 @@ bool OutputTextProto(const unsmear::LeapTableProto& pb) {
   if (!google::protobuf::TextFormat::Print(pb, stream.get())) {
     return false;
   }
-  if (!stream->Close()) {
-    return false;
-  }
-  return true;
+  return stream->Close();
 }
 
 bool OutputJson(const unsmear::LeapTableProto& pb) {
@@ -112,7 +112,7 @@ bool OutputJson(const unsmear::LeapTableProto& pb) {
 bool OutputDebug(const unsmear::LeapTableProto& pb) {
   auto lt = unsmear::NewLeapTableFromProto(pb);
   if (lt == nullptr) {
-    std::cerr << "Failed to construct leap table from proto\n";
+    LOG(ERROR) << "Failed to construct leap table from proto";
     return false;
   }
   std::cout << lt->DebugString();
@@ -123,48 +123,46 @@ bool OutputDebug(const unsmear::LeapTableProto& pb) {
 
 int main(int argc, char** argv) {
   std::vector<char*> args = absl::ParseCommandLine(argc, argv);
+  absl::InitializeLog();
+
   if (args.size() != 2) {
-    std::cerr << kUsage;
-    return 2;
+    LOG(QFATAL) << kUsage;
   }
   const auto& filename = args[1];
 
   unsmear::LeapTableProto pb;
   int fd = open(filename, O_RDONLY);
   if (fd < 0) {
-    std::cerr << "Couldn't open " << filename << ": " << strerror(errno)
-              << "\n";
-    return 1;
+    PLOG(FATAL) << absl::StrCat("Couldn't open ", filename);
   }
   switch (absl::GetFlag(FLAGS_input)) {
     case Format::kProto:
-      if (!pb.ParseFromFileDescriptor(fd)) {
-        std::cerr << "Couldn't parse proto from " << filename << "\n";
-        return 1;
-      }
+      CHECK(pb.ParseFromFileDescriptor(fd))
+          << absl::StrCat("Couldn't parse proto from ", filename);
       break;
     case Format::kTextProto: {
       google::protobuf::io::FileInputStream stream(fd);
-      if (!google::protobuf::TextFormat::Parse(&stream, &pb)) {
-        std::cerr << "Couldn't parse text proto from " << filename << "\n";
-        return 1;
-      }
+      CHECK(google::protobuf::TextFormat::Parse(&stream, &pb))
+          << absl::StrCat("Couldn't parse text proto from ", filename);
       break;
     }
     case Format::kJson:
     case Format::kDebug:
-      std::cerr << "Unsupported --input\n";
-      return 2;
+      LOG(QFATAL) << "Unsupported --input";
   }
 
   switch (absl::GetFlag(FLAGS_output)) {
     case Format::kProto:
-      return OutputProto(pb) ? 0 : 1;
+      CHECK(OutputProto(pb));
+      break;
     case Format::kTextProto:
-      return OutputTextProto(pb) ? 0 : 1;
+      CHECK(OutputTextProto(pb));
+      break;
     case Format::kJson:
-      return OutputJson(pb) ? 0 : 1;
+      CHECK(OutputJson(pb));
+      break;
     case Format::kDebug:
-      return OutputDebug(pb) ? 0 : 1;
+      CHECK(OutputDebug(pb));
+      break;
   }
 }

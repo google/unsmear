@@ -23,6 +23,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":leap_table_cc_proto",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/time",

@@ -2,21 +2,23 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "bazel_skylib",
+    sha256 = "74d544d96f4a5bb630d465ca8bbcfe231e3594e5aae57e1edbf17a6eb3ca2506",
     urls = [
         "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.3.0/bazel-skylib-1.3.0.tar.gz",
         "https://github.com/bazelbuild/bazel-skylib/releases/download/1.3.0/bazel-skylib-1.3.0.tar.gz",
     ],
-    sha256 = "74d544d96f4a5bb630d465ca8bbcfe231e3594e5aae57e1edbf17a6eb3ca2506",
 )
+
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
 bazel_skylib_workspace()
 
 http_archive(
     name = "com_google_absl",
-    sha256 = "91ac87d30cc6d79f9ab974c51874a704de9c2647c40f6932597329a282217ba8",  # SHARED_ABSL_SHA
-    strip_prefix = "abseil-cpp-20220623.1",
+    sha256 = "4d12bd14b5fc2fa912153dcadff1f23ef9dfe5c08e0607ec7a66689bdf41130d",  # SHARED_ABSL_SHA
+    strip_prefix = "abseil-cpp-20230117.rc1",
     urls = [
-        "https://github.com/abseil/abseil-cpp/archive/refs/tags/20220623.1.tar.gz",
+        "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230117.rc1.tar.gz",
     ],
 )
 
