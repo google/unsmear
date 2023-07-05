@@ -16,9 +16,9 @@ bazel_skylib_workspace()
 http_archive(
     name = "com_google_absl",
     sha256 = "4d12bd14b5fc2fa912153dcadff1f23ef9dfe5c08e0607ec7a66689bdf41130d",  # SHARED_ABSL_SHA
-    strip_prefix = "abseil-cpp-20230117.rc1",
+    strip_prefix = "abseil-cpp-20230125.3",
     urls = [
-        "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230117.rc1.tar.gz",
+        "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230125.3.tar.gz",
     ],
 )
 
