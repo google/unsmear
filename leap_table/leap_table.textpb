@@ -26,6 +26,6 @@ positive_leaps: 2456109
 positive_leaps: 2457204
 positive_leaps: 2457754
 
-# This file has been updated through IERS Bulletin C Number 67.
+# This file has been updated through IERS Bulletin C Number 68.
 # https://www.iers.org/IERS/EN/Publications/Bulletins/bulletins.html
-end_jdn: 2460675
+end_jdn: 2460856
